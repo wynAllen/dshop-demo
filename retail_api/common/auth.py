@@ -27,12 +27,22 @@ def GetCurrentUser(
     db: Session = Depends(get_db),
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
 ) -> User:
-    if not credentials or credentials.credentials is None:
+    user = GetCurrentUserOptional(db, credentials)
+    if not user:
         raise AppException(
             message="Not authenticated",
             code="UNAUTHORIZED",
             status_code=401,
         )
+    return user
+
+
+def GetCurrentUserOptional(
+    db: Session = Depends(get_db),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
+) -> Optional[User]:
+    if not credentials or credentials.credentials is None:
+        return None
     token = credentials.credentials
     try:
         payload = jwt.decode(
@@ -40,22 +50,7 @@ def GetCurrentUser(
         )
         user_id = payload.get("sub")
         if not user_id:
-            raise AppException(
-                message="Invalid token",
-                code="UNAUTHORIZED",
-                status_code=401,
-            )
+            return None
     except JWTError:
-        raise AppException(
-            message="Invalid or expired token",
-            code="UNAUTHORIZED",
-            status_code=401,
-        )
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise AppException(
-            message="User not found",
-            code="UNAUTHORIZED",
-            status_code=401,
-        )
-    return user
+        return None
+    return db.query(User).filter(User.id == user_id).first()
