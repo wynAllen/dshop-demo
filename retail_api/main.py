@@ -19,6 +19,7 @@ from retail_api.user.models import User  # noqa: F401 - register with Base
 from retail_api.product.models import Product  # noqa: F401 - register with Base
 from retail_api.cart import router as cart_router
 from retail_api.order import router as order_router
+from retail_api.payment import router as payment_router
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
     app.include_router(product_router.router)
     app.include_router(cart_router.router)
     app.include_router(order_router.router)
+    app.include_router(payment_router.router)
 
     @app.exception_handler(AppException)
     def app_exception_handler(_request: Request, exc: AppException) -> JSONResponse:
