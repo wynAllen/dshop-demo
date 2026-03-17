@@ -1,34 +1,37 @@
 import logging
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import JSONResponse
 
 from retail_api.common.exceptions import AppException
 from retail_api.common.middleware import RequestIdMiddleware
 from retail_api.config import settings
+from retail_api.db.base import Base
+from retail_api.db.session import engine
+from retail_api.user import router as user_router
+from retail_api.user.models import User  # noqa: F401 - register with Base
 
 logger = logging.getLogger(__name__)
 
 
-class _RegisterBody(BaseModel):
-    email: str
-    password: str
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    yield
 
 
 def create_app() -> FastAPI:
-    app = FastAPI(title=settings.app_name)
+    app = FastAPI(title=settings.app_name, lifespan=lifespan)
     app.add_middleware(RequestIdMiddleware)
 
     @app.get("/health")
     def health():
         return {"status": "ok"}
 
-    @app.post("/api/v1/users/register")
-    def _register_stub(_body: _RegisterBody):
-        return {"id": "stub", "email": _body.email}
+    app.include_router(user_router.router)
 
     @app.exception_handler(AppException)
     def app_exception_handler(_request: Request, exc: AppException) -> JSONResponse:
