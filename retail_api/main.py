@@ -11,8 +11,10 @@ from retail_api.common.middleware import RequestIdMiddleware
 from retail_api.config import settings
 from retail_api.db.base import Base
 from retail_api.db.session import engine
+from retail_api.product import router as product_router
 from retail_api.user import router as user_router
 from retail_api.user.models import User  # noqa: F401 - register with Base
+from retail_api.product.models import Product  # noqa: F401 - register with Base
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +34,7 @@ def create_app() -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(user_router.router)
+    app.include_router(product_router.router)
 
     @app.exception_handler(AppException)
     def app_exception_handler(_request: Request, exc: AppException) -> JSONResponse:
