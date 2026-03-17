@@ -38,6 +38,15 @@ def create_app() -> FastAPI:
     def health():
         return {"status": "ok"}
 
+    @app.get("/metrics")
+    def metrics():
+        from starlette.responses import Response
+        from retail_api.common.metrics import GetMetricsBytes
+        return Response(
+            content=GetMetricsBytes(),
+            media_type="text/plain; charset=utf-8",
+        )
+
     app.include_router(user_router.router)
     app.include_router(product_router.router)
     app.include_router(cart_router.router)

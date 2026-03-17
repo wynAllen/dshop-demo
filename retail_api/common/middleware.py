@@ -1,11 +1,14 @@
 import json
 import logging
+import time
 import uuid
 from typing import Callable
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
+
+from retail_api.common.metrics import HTTP_REQUESTS_TOTAL, HTTP_REQUEST_DURATION
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +29,13 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         request_id = request.headers.get("X-Request-Id") or uuid.uuid4().hex
         request.state.request_id = request_id
         _structured_log("INFO", f"{request.method} {request.url.path}", request_id)
+        path = request.scope.get("path", "")
+        method = request.method
+        start = time.perf_counter()
         response = await call_next(request)
+        HTTP_REQUESTS_TOTAL.labels(method=method, path=path).inc()
+        HTTP_REQUEST_DURATION.labels(method=method, path=path).observe(
+            time.perf_counter() - start
+        )
         response.headers["X-Request-Id"] = request_id
         return response
