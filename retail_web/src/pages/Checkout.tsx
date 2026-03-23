@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { NavBar } from "../components/NavBar";
 import { getCart } from "../api/cart";
 import { createOrder } from "../api/orders";
 import type { CartItem } from "../types/api";
 
 export function Checkout() {
+  const { isLoggedIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -29,17 +32,34 @@ export function Checkout() {
     }
   };
 
+  if (!isLoggedIn) {
+    return (
+      <div className="app">
+        <NavBar />
+        <h1 style={{ margin: "0 0 24px", fontSize: "1.5rem", fontWeight: 600 }}>收银台</h1>
+        <div className="cart-page">
+          <div className="empty">
+            <p>请先登录后结算</p>
+            <Link to="/login?redirect=/checkout" className="btn btn-primary" style={{ marginTop: 16 }}>
+              去登录
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div>
-      <h1>收银台</h1>
-      <nav>
-        <Link to="/">商品</Link> | <Link to="/cart">购物车</Link>
-      </nav>
-      <form onSubmit={handleSubmit}>
-        <button type="submit" disabled={loading}>
-          {loading ? "提交中..." : "提交订单"}
-        </button>
-      </form>
+    <div className="app">
+      <NavBar />
+      <h1 style={{ margin: "0 0 24px", fontSize: "1.5rem", fontWeight: 600 }}>收银台</h1>
+      <div className="card" style={{ padding: 24, maxWidth: 400 }}>
+        <form onSubmit={handleSubmit}>
+          <button type="submit" className="btn btn-primary" disabled={loading} style={{ width: "100%" }}>
+            {loading ? "提交中..." : "提交订单"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
