@@ -1,7 +1,9 @@
 const BASE = "";
 
+const TOKEN_KEY = "token";
+
 function getToken(): string | null {
-  return localStorage.getItem("token");
+  return localStorage.getItem(TOKEN_KEY);
 }
 
 export async function apiFetch<T>(
