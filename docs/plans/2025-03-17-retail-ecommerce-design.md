@@ -10,13 +10,15 @@
 
 ## 2. 技术选型
 
-| 层级 | 选型 |
-|------|------|
-| 前端（Web） | React + TypeScript + Vite 或 Next.js |
-| 后端 | Python 3.11+ / FastAPI，REST + OpenAPI 3 |
-| 数据 | PostgreSQL（主库）、Redis（缓存/会话）、Elasticsearch（商品/订单搜索） |
-| 部署 | 前端静态资源；后端 Docker，多实例或 K8s/云托管 |
-| 可观测 | 结构化日志 + Loki；OpenTelemetry + Jaeger/Tempo；Prometheus + Grafana |
+
+| 层级      | 选型                                                             |
+| ------- | -------------------------------------------------------------- |
+| 前端（Web） | React + TypeScript + Vite 或 Next.js                            |
+| 后端      | Python 3.11+ / FastAPI，REST + OpenAPI 3                        |
+| 数据      | PostgreSQL（主库）、Redis（缓存/会话）、Elasticsearch（商品/订单搜索）             |
+| 部署      | 前端静态资源；后端 Docker，多实例或 K8s/云托管                                  |
+| 可观测     | 结构化日志 + Loki；OpenTelemetry + Jaeger/Tempo；Prometheus + Grafana |
+
 
 ## 3. 整体架构与边界
 
@@ -85,3 +87,4 @@
 
 - 实现前根据本设计编写 implementation plan（writing-plans）。
 - 多端扩展时复用同一 API 契约与 trace_id 透传；若拆微服务，各服务接入 OpenTelemetry 与统一日志格式。
+
