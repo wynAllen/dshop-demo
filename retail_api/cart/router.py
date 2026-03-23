@@ -1,9 +1,7 @@
-from typing import Optional
-
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from retail_api.common.auth import GetCurrentUserOptional
+from retail_api.common.auth import GetCurrentUser
 from retail_api.db.session import get_db
 from retail_api.user.models import User
 from retail_api.cart.schemas import CartItemIn, CartItemOut, CartItemUpdate, CartOut
@@ -18,12 +16,8 @@ from retail_api.cart.service import (
 router = APIRouter(prefix="/api/v1/cart", tags=["cart"])
 
 
-def _cart_id(
-    x_cart_id: Optional[str] = Header(None, alias="X-Cart-Id"),
-    current_user: Optional[User] = Depends(GetCurrentUserOptional),
-) -> str:
-    user_id = current_user.id if current_user else None
-    return GetCartId(user_id, x_cart_id)
+def _cart_id(current_user: User = Depends(GetCurrentUser)) -> str:
+    return GetCartId(current_user.id, None)
 
 
 @router.get("", response_model=CartOut)
