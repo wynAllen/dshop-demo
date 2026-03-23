@@ -1,4 +1,5 @@
 import uuid
+from typing import Optional
 
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
@@ -29,7 +30,7 @@ def CreateUser(db: Session, data: RegisterIn) -> User:
     return user
 
 
-def AuthenticateUser(db: Session, email: str, password: str) -> User | None:
+def AuthenticateUser(db: Session, email: str, password: str) -> Optional[User]:
     user = db.query(User).filter(User.email == email).first()
     if not user or not pwd_context.verify(password, user.hashed_password):
         return None
