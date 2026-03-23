@@ -1,5 +1,6 @@
 .venv_retail/
 retail_web/node_modules/
+.run/
 __pycache__/
 *.pyc
 .pytest_cache/
